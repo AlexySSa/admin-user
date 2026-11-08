@@ -81,11 +81,55 @@
     });
   });
 
+  // Navegación táctil y con mouse: deslizar o tocar la mitad izquierda/derecha.
+  // Los controles de progreso conservan su propio evento de clic.
   if (hero) {
-    hero.addEventListener('mouseenter', () => clearInterval(autoTimer));
-    hero.addEventListener('mouseleave', startAuto);
-    hero.addEventListener('touchstart', () => clearInterval(autoTimer), { passive: true });
-    hero.addEventListener('touchend', startAuto, { passive: true });
+    let gesture = null;
+    hero.addEventListener('pointerdown', (event) => {
+      if (!event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0) ||
+          event.target.closest('.hero__progress')) return;
+      gesture = {
+        id: event.pointerId, x: event.clientX, y: event.clientY,
+        time: performance.now()
+      };
+      clearInterval(autoTimer);
+    });
+
+    hero.addEventListener('pointerup', (event) => {
+      if (!gesture || event.pointerId !== gesture.id) return;
+      const dx = event.clientX - gesture.x;
+      const dy = event.clientY - gesture.y;
+      const duration = performance.now() - gesture.time;
+      gesture = null;
+
+      if (Math.abs(dx) >= 35 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+        // Izquierda -> siguiente, derecha -> anterior.
+        showSlide(current + (dx < 0 ? 1 : -1));
+      } else if (Math.abs(dx) < 12 && Math.abs(dy) < 12 && duration < 700 &&
+                 !event.target.closest('.hero__progress')) {
+        const bounds = hero.getBoundingClientRect();
+        // Tocar la mitad izquierda retrocede; tocar la derecha avanza.
+        showSlide(current + (event.clientX < bounds.left + bounds.width / 2 ? -1 : 1));
+      }
+      startAuto();
+    });
+
+    hero.addEventListener('pointercancel', () => {
+      gesture = null;
+      startAuto();
+    });
+
+    hero.addEventListener('keydown', (event) => {
+      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+      event.preventDefault();
+      showSlide(current + (event.key === 'ArrowLeft' ? -1 : 1));
+      startAuto();
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) clearInterval(autoTimer);
+      else startAuto();
+    });
   }
 
   shareButton?.addEventListener('click', async () => {
