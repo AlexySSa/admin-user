@@ -35,3 +35,5 @@
 .hero__img{pointer-events:none;-webkit-user-drag:none}
 .gallery-hint{margin:13px 0 -10px;text-align:center;color:#767681;font:600 9px/1.5 'Space Grotesk',sans-serif;letter-spacing:.14em}
 @media(hover:hover){.hero__slides{cursor:ew-resize}}
+
+.quote-source{margin:-18px 0 30px;color:#777982;font:500 10px/1.5 'Space Grotesk',sans-serif;letter-spacing:.075em}.quote-source cite{font-style:normal;color:#a9ada7}
