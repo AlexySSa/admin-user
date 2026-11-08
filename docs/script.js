@@ -50,14 +50,36 @@
         void bar.offsetWidth;
         bar.style.animation = '';
       }
+      dot.setAttribute('aria-current', index === activeIndex ? 'true' : 'false');
       if (index < activeIndex) dot.classList.add('is-complete');
       if (index === activeIndex) dot.classList.add('is-active');
     });
   };
 
+  let exitCleanup;
   const showSlide = (index) => {
-    current = (index + slides.length) % slides.length;
-    slides.forEach((slide, i) => slide.classList.toggle('is-active', i === current));
+    const next = (index + slides.length) % slides.length;
+    if (next !== current) {
+      const direction = index > current ? 1 : -1;
+      hero?.style.setProperty('--slide-direction', direction);
+      const outgoing = slides[current];
+      const incoming = slides[next];
+      clearTimeout(exitCleanup);
+      // Clear any stale transitions from a quick series of swipes.
+      slides.forEach((slide, i) => {
+        if (i !== current && i !== next) slide.classList.remove('is-active', 'is-exiting');
+      });
+      // Establish the off-screen state before smoothly revealing the new photo.
+      incoming.classList.remove('is-active', 'is-exiting');
+      void incoming.offsetWidth;
+      outgoing.classList.remove('is-active');
+      outgoing.classList.add('is-exiting');
+      incoming.classList.add('is-active');
+      exitCleanup = setTimeout(() => {
+        if (!outgoing.classList.contains('is-active')) outgoing.classList.remove('is-exiting');
+      }, 1050);
+    }
+    current = next;
     const active = slides[current];
     kicker.textContent = active.dataset.kicker || '';
     counter.textContent = `${current + 1} / ${slides.length}`;

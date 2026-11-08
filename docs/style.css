@@ -37,3 +37,12 @@
 @media(hover:hover){.hero__slides{cursor:ew-resize}}
 
 .quote-source{margin:-18px 0 30px;color:#777982;font:500 10px/1.5 'Space Grotesk',sans-serif;letter-spacing:.075em}.quote-source cite{font-style:normal;color:#a9ada7}
+
+/* V5: transición cinematográfica con profundidad y deslizamiento direccional. */
+.hero__slide{opacity:0;transform:translate3d(calc(var(--slide-direction,1) * 9%),0,0) scale(1.045);filter:blur(6px);transition:opacity .8s cubic-bezier(.25,.75,.25,1),transform 1s cubic-bezier(.22,1,.36,1),filter .8s ease;backface-visibility:hidden;pointer-events:none}
+.hero__slide.is-active{opacity:1;transform:translate3d(0,0,0) scale(1);filter:blur(0);z-index:2}
+.hero__slide.is-exiting{opacity:0;transform:translate3d(calc(var(--slide-direction,1) * -7%),0,0) scale(1.025);filter:blur(3px);z-index:1}
+.hero__slide.is-active .hero__img{transform:scale(1.09) translate3d(0,-.7%,0);transition:transform 5s linear,filter .6s ease}
+.hero__slide:not(.is-active) .hero__img{transform:scale(1.04)}
+.hero__slide.is-active .hero__img.is-preview{transform:scale(1.09)}
+@media (prefers-reduced-motion:reduce){.hero__slide,.hero__slide.is-active,.hero__slide.is-exiting{transform:none!important;filter:none!important;transition:none!important}.hero__slide .hero__img{transform:none!important;transition:none!important}}
